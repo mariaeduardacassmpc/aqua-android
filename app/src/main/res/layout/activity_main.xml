@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F4F8FB">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <include
+                layout="@layout/view_aqua_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Sua hidratação diária"
+                android:textColor="#718096"
+                android:textSize="17sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:background="#FFFFFF"
+                android:elevation="3dp"
+                android:orientation="vertical"
+                android:padding="22dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CONSUMO DE HOJE"
+                    android:textColor="#718096"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvConsumed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="0 ml"
+                    android:textColor="#183B4E"
+                    android:textSize="34sp"
+                    android:textStyle="bold" />
+
+                <ProgressBar
+                    android:id="@+id/progressWater"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"
+                    android:layout_marginTop="18dp"
+                    android:progressTint="#087E8B"
+                    android:progressBackgroundTint="#DCECEF"
+                    android:max="2000"
+                    android:progress="0" />
+
+                <TextView
+                    android:id="@+id/tvProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0% da meta atingida"
+                    android:textColor="#718096"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tvDailyGoal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Meta diária: 2000 ml"
+                    android:textSize="18sp"
+                    android:textColor="#183B4E"
+                    android:clickable="true"
+                    android:focusable="true" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="Adicionar água"
+                android:textColor="#183B4E"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal"
+                android:weightSum="3">
+
+                <Button
+                    android:id="@+id/btn200"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:backgroundTint="#087E8B"
+                    android:text="+200 ml"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="2dp" />
+
+                <Button
+                    android:id="@+id/btn300"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="4dp"
+                    android:backgroundTint="#087E8B"
+                    android:text="+300 ml"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="2dp" />
+
+                <Button
+                    android:id="@+id/btn500"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:backgroundTint="#087E8B"
+                    android:text="+500 ml"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:minWidth="0dp"
+                    android:paddingHorizontal="2dp" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnUndo"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#DCECEF"
+                android:text="Desfazer último registro"
+                android:textColor="#183B4E"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <include layout="@layout/view_bottom_nav" />
+
+</LinearLayout>
