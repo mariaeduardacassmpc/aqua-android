@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F8FB"
+    android:background="@color/aqua_background"
     android:fillViewport="true">
 
     <LinearLayout
@@ -11,26 +12,23 @@
         android:gravity="center"
         android:orientation="vertical"
         android:paddingStart="20dp"
-        android:paddingEnd="20dp"
         android:paddingTop="20dp"
+        android:paddingEnd="20dp"
         android:paddingBottom="24dp">
 
         <TextView
+            style="@style/AquaAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Aqua"
-            android:textColor="#087E8B"
-            android:textSize="38sp"
-            android:textStyle="bold" />
+            android:text="@string/app_name" />
 
         <TextView
+            style="@style/AquaSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="24dp"
-            android:text="Cuide da sua hidratação"
-            android:textColor="#718096"
-            android:textSize="16sp" />
+            android:text="@string/login_tagline" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -41,54 +39,66 @@
             android:padding="22dp">
 
             <TextView
+                style="@style/AquaCardTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bem-vinda de volta!"
-                android:textColor="#183B4E"
-                android:textSize="25sp"
-                android:textStyle="bold" />
+                android:text="@string/login_title" />
 
             <TextView
+                style="@style/AquaSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="24dp"
-                android:text="Entre na sua conta para continuar."
-                android:textColor="#718096"
-                android:textSize="16sp" />
+                android:text="@string/login_subtitle" />
 
-            <EditText
-                android:id="@+id/etEmail"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilEmail"
+                style="?attr/textInputOutlinedStyle"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:backgroundTint="#087E8B"
-                android:hint="E-mail"
-                android:inputType="textEmailAddress"
-                android:paddingHorizontal="12dp"
-                android:singleLine="true" />
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_email"
+                app:boxStrokeColor="@color/aqua_primary"
+                app:hintTextColor="@color/aqua_primary">
 
-            <EditText
-                android:id="@+id/etPassword"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="emailAddress"
+                    android:imeOptions="actionNext"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilPassword"
+                style="?attr/textInputOutlinedStyle"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:backgroundTint="#087E8B"
-                android:hint="Senha"
-                android:inputType="textPassword"
-                android:paddingHorizontal="12dp"
-                android:singleLine="true" />
+                android:hint="@string/hint_password"
+                app:boxStrokeColor="@color/aqua_primary"
+                app:endIconMode="password_toggle"
+                app:hintTextColor="@color/aqua_primary">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="password"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/tvForgotPassword"
+                style="@style/AquaLink"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:clickable="true"
-                android:focusable="true"
                 android:gravity="end|center_vertical"
-                android:text="Esqueci minha senha"
-                android:textColor="#087E8B"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:text="@string/forgot_password" />
 
             <ProgressBar
                 android:id="@+id/progressLogin"
@@ -96,7 +106,7 @@
                 android:layout_height="32dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:indeterminateTint="#087E8B"
+                android:indeterminateTint="@color/aqua_primary"
                 android:visibility="gone" />
 
             <Button
@@ -104,35 +114,30 @@
                 style="@style/AquaButton"
                 android:layout_width="match_parent"
                 android:layout_marginTop="8dp"
-                android:text="Entrar" />
+                android:text="@string/action_login" />
 
             <TextView
                 android:id="@+id/tvLoginError"
+                style="@style/AquaError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:textColor="#C62828"
-                android:textSize="15sp"
                 android:visibility="gone" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="12dp"
-                android:background="#E8EFF3" />
+                android:background="@color/aqua_divider" />
 
             <TextView
                 android:id="@+id/tvGoRegister"
+                style="@style/AquaLink"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="4dp"
-                android:clickable="true"
-                android:focusable="true"
                 android:gravity="center"
-                android:text="Não tem uma conta? Criar conta"
-                android:textColor="#087E8B"
-                android:textSize="15sp"
-                android:textStyle="bold" />
+                android:text="@string/go_register" />
 
         </LinearLayout>
     </LinearLayout>

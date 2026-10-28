@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="aqua_primary">#087E8B</color>
+    <color name="aqua_bar">#69C7E5</color>
+    <color name="aqua_text">#183B4E</color>
+    <color name="aqua_muted">#526777</color>
+    <color name="aqua_muted_light">#718096</color>
+    <color name="aqua_border">#E4EDF2</color>
+    <color name="aqua_nav_inactive">#F4F8FB</color>
+    <color name="aqua_background">#F4F8FB</color>
+    <color name="aqua_divider">#DCE6EB</color>
 </resources>

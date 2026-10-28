@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F4F8FB">
+    android:background="@color/aqua_background">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -30,8 +30,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Sua hidratação diária"
-                android:textColor="#183B4E"
+                android:text="@string/home_title"
+                android:textColor="@color/aqua_text"
                 android:textSize="25sp"
                 android:textStyle="bold" />
 
@@ -39,8 +39,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Pequenos goles, grandes hábitos."
-                android:textColor="#718096"
+                android:text="@string/home_subtitle"
+                android:textColor="@color/aqua_muted_light"
                 android:textSize="16sp" />
 
             <LinearLayout
@@ -55,8 +55,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SEU CONSUMO DE HOJE"
-                    android:textColor="#718096"
+                    android:text="@string/today_consumption"
+                    android:textColor="@color/aqua_muted_light"
                     android:textSize="15sp"
                     android:letterSpacing="0.06"
                     android:textStyle="bold" />
@@ -66,8 +66,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="0 ml"
-                    android:textColor="#087E8B"
+                    android:text="@string/initial_water_consumption"
+                    android:textColor="@color/aqua_primary"
                     android:textSize="38sp"
                     android:textStyle="bold" />
 
@@ -79,16 +79,16 @@
                     android:layout_marginTop="18dp"
                     android:max="2000"
                     android:progress="0"
-                    android:progressTint="#087E8B"
-                    android:progressBackgroundTint="#DCECEF" />
+                    android:progressTint="@color/aqua_primary"
+                    android:progressBackgroundTint="@color/aqua_divider" />
 
                 <TextView
                     android:id="@+id/tvProgress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="0% da meta atingida"
-                    android:textColor="#526777"
+                    android:text="@string/initial_water_progress"
+                    android:textColor="@color/aqua_text"
                     android:textSize="15sp" />
 
                 <View
@@ -96,7 +96,7 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="18dp"
                     android:layout_marginBottom="14dp"
-                    android:background="#E8EFF3" />
+                    android:background="@color/aqua_divider" />
 
                 <TextView
                     android:id="@+id/tvDailyGoal"
@@ -106,8 +106,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:paddingVertical="8dp"
-                    android:text="Meta diária: 2000 ml  ›"
-                    android:textColor="#183B4E"
+                    android:text="@string/initial_daily_goal"
+                    android:textColor="@color/aqua_text"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
@@ -117,8 +117,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
-                android:text="Adicionar água"
-                android:textColor="#183B4E"
+                android:text="@string/add_water_title"
+                android:textColor="@color/aqua_text"
                 android:textSize="21sp"
                 android:textStyle="bold" />
 
@@ -126,8 +126,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="Quanto você bebeu agora?"
-                android:textColor="#718096"
+                android:text="@string/add_water_subtitle"
+                android:textColor="@color/aqua_muted_light"
                 android:textSize="15sp" />
 
             <LinearLayout
@@ -139,48 +139,39 @@
 
                 <Button
                     android:id="@+id/btn200"
+                    style="@style/AquaButton"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginEnd="5dp"
-                    android:backgroundTint="#087E8B"
                     android:minWidth="0dp"
-                    android:minHeight="0dp"
                     android:paddingHorizontal="2dp"
-                    android:text="+200 ml"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:text="@string/water_200"
+                    android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/btn300"
+                    style="@style/AquaButton"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginHorizontal="5dp"
-                    android:backgroundTint="#087E8B"
                     android:minWidth="0dp"
-                    android:minHeight="0dp"
                     android:paddingHorizontal="2dp"
-                    android:text="+300 ml"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:text="@string/water_300"
+                    android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/btn500"
+                    style="@style/AquaButton"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:layout_marginStart="5dp"
-                    android:backgroundTint="#087E8B"
                     android:minWidth="0dp"
-                    android:minHeight="0dp"
                     android:paddingHorizontal="2dp"
-                    android:text="+500 ml"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:text="@string/water_500"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
@@ -189,10 +180,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="12dp"
-                android:backgroundTint="#E1EDF2"
+                android:backgroundTint="@color/aqua_divider"
                 android:minHeight="0dp"
-                android:text="Desfazer último registro"
-                android:textColor="#183B4E"
+                android:text="@string/undo_water"
+                android:textColor="@color/aqua_text"
                 android:textSize="15sp"
                 android:textAllCaps="false" />
 

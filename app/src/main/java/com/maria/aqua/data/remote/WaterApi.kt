@@ -1,5 +1,9 @@
-package com.maria.aqua
+package com.maria.aqua.data.remote
 
+import com.maria.aqua.CreateWaterLogRequest
+import com.maria.aqua.DailyTotalResponse
+import com.maria.aqua.DayHistoryResponse
+import com.maria.aqua.WaterLogResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -26,5 +30,8 @@ interface WaterApi {
     ): Response<DayHistoryResponse>
 
     @GET("api/WaterLogs/history")
-    suspend fun getHistory(): Response<List<DailyTotalResponse>>
+    suspend fun getHistory(
+        @Query("from") from: String,
+        @Query("to") to: String
+    ): Response<List<DailyTotalResponse>>
 }

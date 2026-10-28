@@ -1,3 +1,61 @@
 <resources>
     <string name="app_name">Aqua</string>
+    <string name="chart_title">Consumo recente</string>
+    <string name="chart_summary">Total: %1$d ml  •  Média: %2$d ml/dia</string>
+    <string name="logs_today_title">Registros de hoje</string>
+    <string name="log_amount">+%1$d ml</string>
+    <string name="log_time">Registrado às %1$s</string>
+    <string name="error_network">Sem conexão. Verifique sua internet.</string>
+    <string name="error_server">O servidor não respondeu como esperado.</string>
+    <string name="error_unknown">Não foi possível carregar o histórico.</string>
+    <string name="forgot_title">Recuperar senha</string>
+    <string name="forgot_subtitle">Informe seu e-mail cadastrado. Vamos ajudar você a recuperar o acesso à sua conta.</string>
+    <string name="hint_forgot_email">Seu e-mail</string>
+    <string name="action_send_recovery">Enviar instruções</string>
+    <string name="back_to_login">Voltar para o login</string>
+    <string name="reset_title">Redefinir senha</string>
+    <string name="reset_subtitle">Digite o código enviado para seu e-mail e escolha uma nova senha.</string>
+    <string name="hint_reset_code">Código de recuperação</string>
+    <string name="hint_new_password">Nova senha</string>
+    <string name="hint_confirm_password">Confirmar nova senha</string>
+    <string name="action_reset_password">Redefinir senha</string>
+    <string name="login_tagline">Cuide da sua hidratação</string>
+
+    <string name="register_tagline">Cuide da sua hidratação</string>
+    <string name="register_title">Criar conta</string>
+    <string name="register_subtitle">Preencha seus dados para começar.</string>
+    <string name="hint_name">Nome completo</string>
+    <string name="action_register">Criar conta</string>
+    <string name="go_login">Já tem uma conta? Entrar</string>
+
+    <string name="login_title">Entrar na sua conta</string>
+    <string name="login_subtitle">Acesse sua conta para acompanhar sua hidratação.</string>
+    <string name="hint_email">E-mail</string>
+    <string name="hint_password">Senha</string>
+    <string name="forgot_password">Esqueci minha senha</string>
+    <string name="action_login">Entrar</string>
+    <string name="go_register">Não tem uma conta? Cadastre-se</string>
+    <string name="initial_water_consumption">0 ml</string>
+    <string name="initial_water_progress">0% da meta atingida</string>
+    <string name="initial_daily_goal">Meta diária: 2000 ml  ›</string>
+
+    <string name="home_title">Sua hidratação diária</string>
+    <string name="home_subtitle">Pequenos goles, grandes hábitos.</string>
+    <string name="today_consumption">SEU CONSUMO DE HOJE</string>
+    <string name="water_progress">0% da meta atingida</string>
+    <string name="daily_goal">Meta diária: %1$d ml  ›</string>
+    <string name="add_water_title">Adicionar água</string>
+    <string name="add_water_subtitle">Quanto você bebeu agora?</string>
+    <string name="water_200">+200 ml</string>
+    <string name="water_300">+300 ml</string>
+    <string name="water_500">+500 ml</string>
+    <string name="undo_water">Desfazer último registro</string>
+    <string name="water_ml">%1$d ml</string>
+    <string name="water_percentage">%1$d%% da meta atingida</string>
+    <string name="history_title">Histórico</string>
+    <string name="history_subtitle">Acompanhe sua hidratação diária.</string>
+    <string name="history_summary_title">CONSUMO REGISTRADO HOJE</string>
+    <string name="history_today">Água consumida hoje</string>
+    <string name="history_records_title">Seus registros</string>
+    <string name="history_empty">\nNenhum registro ainda.\nAdicione água na tela inicial para começar!</string>
 </resources>

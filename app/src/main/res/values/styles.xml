@@ -12,4 +12,38 @@
         <item name="cornerRadius">26dp</item>
     </style>
 
+    <style name="AquaAppName" parent="">
+        <item name="android:textColor">@color/aqua_primary</item>
+        <item name="android:textSize">38sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AquaCardTitle" parent="">
+        <item name="android:textColor">@color/aqua_text</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="AquaSubtitle" parent="">
+        <item name="android:textColor">@color/aqua_muted_light</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="AquaLink" parent="">
+        <item name="android:textColor">@color/aqua_primary</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="AquaError" parent="">
+        <color name="aqua_error">#D32F2F</color>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="AquaDivider">
+        <item name="android:background">@color/aqua_divider</item>
+    </style>
+
 </resources>

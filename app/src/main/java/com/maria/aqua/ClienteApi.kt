@@ -2,6 +2,7 @@
 package com.maria.aqua
 
 import android.content.Context
+import com.maria.aqua.data.remote.WaterApi
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

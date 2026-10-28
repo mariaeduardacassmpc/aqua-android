@@ -1,4 +1,3 @@
-
 package com.maria.aqua.activity
 
 import android.Manifest
@@ -8,9 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -18,26 +14,33 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.maria.aqua.ClienteApi
 import com.maria.aqua.CreateWaterLogRequest
 import com.maria.aqua.HistoryActivity
 import com.maria.aqua.R
+import com.maria.aqua.data.remote.WaterApi
 import com.maria.aqua.WaterHistory
 import com.maria.aqua.WaterLogResponse
 import com.maria.aqua.WaterRecord
+import com.maria.aqua.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.koin.android.ext.android.inject
+import com.maria.aqua.databinding.ViewBottomNavBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+    private val waterApi: WaterApi by inject()
     private var dailyGoal = 2000
     private var consumedWater = 0
     private val waterLogs = mutableListOf<WaterLogResponse>()
-    private lateinit var tvConsumed: TextView
-    private lateinit var tvProgress: TextView
-    private lateinit var progressWater: ProgressBar
-    private lateinit var btnUndo: Button
+    private val tvConsumed get() = binding.tvConsumed
+    private val tvProgress get() = binding.tvProgress
+    private val progressWater get() = binding.progressWater
+    private val btnUndo get() = binding.btnUndo
+
+    private lateinit var bottomNavBinding: ViewBottomNavBinding
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -54,29 +57,29 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        ClienteApi.initialize(applicationContext)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+
+        bottomNavBinding = ViewBottomNavBinding.bind(
+            findViewById(R.id.bottomNav)
+        )
 
         createNotificationChannel()
         requestNotificationPermission()
 
-        tvConsumed = findViewById(R.id.tvConsumed)
-        tvProgress = findViewById(R.id.tvProgress)
-        progressWater = findViewById(R.id.progressWater)
-        btnUndo = findViewById(R.id.btnUndo)
-
         progressWater.max = dailyGoal
 
-        findViewById<Button>(R.id.btn200).setOnClickListener {
+        binding.btn200.setOnClickListener {
             addWater(200)
         }
 
-        findViewById<Button>(R.id.btn300).setOnClickListener {
+        binding.btn300.setOnClickListener {
             addWater(300)
         }
 
-        findViewById<Button>(R.id.btn500).setOnClickListener {
+        binding.btn500.setOnClickListener {
             addWater(500)
         }
 
@@ -84,11 +87,12 @@ class MainActivity : AppCompatActivity() {
             undoLastWater()
         }
 
-        findViewById<Button>(R.id.navHistory).setOnClickListener {
+        binding.navHistory.setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
 
         updateScreen()
+        loadTodayWater()
     }
 
     private fun createNotificationChannel() {
@@ -103,6 +107,7 @@ class MainActivity : AppCompatActivity() {
 
             val manager =
                 getSystemService(NotificationManager::class.java)
+
             manager.createNotificationChannel(channel)
         }
     }
@@ -121,6 +126,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun showWaterNotification(amount: Int) {
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -132,7 +138,10 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val notification = NotificationCompat.Builder(this, "aqua_water")
+        val notification = NotificationCompat.Builder(
+            this,
+            "aqua_water"
+        )
             .setSmallIcon(R.drawable.ic_notification_water)
             .setContentTitle("Aqua")
             .setContentText("Você adicionou $amount ml de água!")
@@ -149,13 +158,14 @@ class MainActivity : AppCompatActivity() {
         NotificationManagerCompat.from(this)
             .notify(System.currentTimeMillis().toInt(), notification)
     }
+
     private fun addWater(amount: Int) {
         btnUndo.isEnabled = false
 
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ClienteApi.waterApi.create(
+                    waterApi.create(
                         CreateWaterLogRequest(amountMl = amount)
                     )
                 }
@@ -208,6 +218,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun undoLastWater() {
         val lastLog = waterLogs.lastOrNull()
 
@@ -225,11 +236,12 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ClienteApi.waterApi.delete(lastLog.id)
+                    waterApi.delete(lastLog.id)
                 }
 
                 if (response.isSuccessful) {
                     waterLogs.removeAt(waterLogs.lastIndex)
+
                     consumedWater =
                         (consumedWater - lastLog.amountMl).coerceAtLeast(0)
 
@@ -266,6 +278,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     private fun updateScreen() {
         tvConsumed.text = "$consumedWater ml"
 
@@ -281,13 +294,14 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ClienteApi.waterApi.getDay()
+                    waterApi.getDay()
                 }
 
                 if (response.isSuccessful) {
                     val dayData = response.body() ?: return@launch
 
                     consumedWater = dayData.totalMl
+
                     waterLogs.clear()
                     waterLogs.addAll(dayData.logs)
 

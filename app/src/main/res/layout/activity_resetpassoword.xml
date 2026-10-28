@@ -1,130 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F8FB"
+    android:background="?attr/colorSurface"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="28dp">
+        android:paddingStart="20dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="24dp">
 
         <TextView
+            style="@style/AquaAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Aqua"
-            android:textColor="#147D92"
-            android:textSize="38sp"
-            android:textStyle="bold" />
+            android:text="@string/app_name" />
 
         <TextView
+            style="@style/AquaSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="32dp"
-            android:text="Cuide da sua hidratação"
-            android:textColor="#64748B"
-            android:textSize="16sp" />
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="24dp"
+            android:text="@string/login_tagline" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:elevation="4dp"
+            android:background="@drawable/bg_water_card"
+            android:elevation="3dp"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="22dp">
 
             <TextView
+                style="@style/AquaCardTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Redefinir senha"
-                android:textColor="#17324D"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:text="@string/reset_title" />
 
             <TextView
+                style="@style/AquaSubtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginBottom="24dp"
-                android:text="Digite o código enviado para seu e-mail e escolha uma nova senha."
-                android:textColor="#64748B"
-                android:textSize="15sp" />
+                android:text="@string/reset_subtitle" />
 
-            <EditText
-                android:id="@+id/etResetCode"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilResetCode"
+                style="?attr/textInputOutlinedStyle"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:hint="Código de recuperação"
-                android:inputType="number"
-                android:singleLine="true"
-                android:paddingHorizontal="12dp"
-                android:backgroundTint="#147D92" />
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_reset_code"
+                app:endIconMode="clear_text">
 
-            <EditText
-                android:id="@+id/etNewPassword"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etResetCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:imeOptions="actionNext"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNewPassword"
+                style="?attr/textInputOutlinedStyle"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Nova senha"
-                android:inputType="textPassword"
-                android:singleLine="true"
-                android:paddingHorizontal="12dp"
-                android:backgroundTint="#147D92" />
+                android:hint="@string/hint_new_password"
+                app:endIconMode="password_toggle">
 
-            <EditText
-                android:id="@+id/etConfirmPassword"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etNewPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:imeOptions="actionNext"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilConfirmPassword"
+                style="?attr/textInputOutlinedStyle"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Confirmar nova senha"
-                android:inputType="textPassword"
-                android:singleLine="true"
-                android:paddingHorizontal="12dp"
-                android:backgroundTint="#147D92" />
+                android:hint="@string/hint_confirm_password"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:imeOptions="actionDone"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <ProgressBar
                 android:id="@+id/progressResetPassword"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
+                android:indeterminateTint="?attr/colorPrimary"
                 android:visibility="gone" />
 
             <Button
                 android:id="@+id/btnResetPassword"
+                style="@style/AquaButton"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="20dp"
-                android:backgroundTint="#147D92"
-                android:text="Redefinir senha"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:layout_marginTop="16dp"
+                android:text="@string/action_reset_password" />
 
             <TextView
                 android:id="@+id/tvResetPasswordMessage"
+                style="@style/AquaError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:textColor="#C62828"
-                android:textSize="14sp"
                 android:visibility="gone" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:background="?attr/colorOutlineVariant" />
 
             <TextView
                 android:id="@+id/tvBackToLogin"
+                style="@style/AquaLink"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="4dp"
                 android:gravity="center"
-                android:text="Voltar para o login"
-                android:textColor="#147D92"
-                android:textSize="15sp"
-                android:clickable="true"
-                android:focusable="true" />
+                android:text="@string/back_to_login" />
 
         </LinearLayout>
     </LinearLayout>

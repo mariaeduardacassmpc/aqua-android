@@ -5,20 +5,38 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.maria.aqua.activity.MainActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import com.maria.aqua.activity.MainActivity
+import java.util.TimeZone
+
 class HistoryActivity : AppCompatActivity() {
+
+    private val locale = Locale("pt", "BR")
+    private val dayFormatter = SimpleDateFormat("yyyyMMdd", locale)
+    private val labelFormatter = SimpleDateFormat("EEE", locale)
+    private val timeFormatter = SimpleDateFormat("HH:mm", locale).apply {
+        timeZone = TimeZone.getDefault()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
+
+        ClienteApi.initialize(applicationContext)
 
         val navHome = findViewById<Button>(R.id.navHome)
         val navHistory = findViewById<Button>(R.id.navHistory)
@@ -39,24 +57,120 @@ class HistoryActivity : AppCompatActivity() {
         }
 
         navHistory.setOnClickListener {
-            showHistory()
+            loadHistory()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        showHistory()
+        loadHistory()
     }
 
+    private fun loadHistory() {
+        lifecycleScope.launch {
+            try {
+                val today = java.time.LocalDate.now()
+                val from = today.minusDays(4).toString()
+                val to = today.toString()
 
-    private fun showHistory() {
-        val allRecords = WaterHistory.records.toList()
-        val dayFormatter = java.text.SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-        val labelFormatter = java.text.SimpleDateFormat("dd/MM", Locale.getDefault())
+                val dayResponse: retrofit2.Response<DayHistoryResponse>
+                val historyResponse: retrofit2.Response<List<DailyTotalResponse>>
+
+                withContext(Dispatchers.IO) {
+                    dayResponse = ClienteApi.waterApi.getDay()
+                    historyResponse = ClienteApi.waterApi.getHistory(from, to)
+                }
+
+                if (!dayResponse.isSuccessful || !historyResponse.isSuccessful) {
+                    Toast.makeText(
+                        this@HistoryActivity,
+                        "Erro ao carregar histórico: dia ${dayResponse.code()}, gráfico ${historyResponse.code()}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@launch
+                }
+
+                val dayData = dayResponse.body() ?: return@launch
+                val historyData = historyResponse.body().orEmpty()
+
+                val todayRecords = dayData.logs.map { log ->
+                    WaterRecord(
+                        amount = log.amountMl,
+                        timestamp = parseTimestamp(log.consumedAt)
+                    )
+                }
+
+                WaterHistory.records.clear()
+                WaterHistory.records.addAll(todayRecords)
+
+                val dailyTotals = historyData.associate { item ->
+                    normalizeDay(item.day) to item.totalMl
+                }.toMutableMap()
+
+                dailyTotals[normalizeDay(today.toString())] = dayData.totalMl
+
+                renderHistory(
+                    todayRecords = todayRecords,
+                    dailyTotals = dailyTotals
+                )
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@HistoryActivity,
+                    "Erro ao carregar histórico: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+    private fun parseTimestamp(value: String): Long {
+        return try {
+            val normalized = value.replace(" ", "T")
+            val patterns = listOf(
+                "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+                "yyyy-MM-dd'T'HH:mm:ssXXX",
+                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                "yyyy-MM-dd'T'HH:mm:ss"
+            )
+
+            patterns.firstNotNullOfOrNull { pattern ->
+                try {
+                    val formatter = SimpleDateFormat(pattern, Locale.US)
+                    formatter.isLenient = false
+                    if (pattern.endsWith("'Z'")) {
+                        formatter.timeZone = TimeZone.getTimeZone("UTC")
+                    }
+                    formatter.parse(normalized)?.time
+                } catch (_: Exception) {
+                    null
+                }
+            } ?: System.currentTimeMillis()
+        } catch (_: Exception) {
+            System.currentTimeMillis()
+        }
+    }
+
+    private fun normalizeDay(value: String): String {
+        return try {
+            val datePart = value.take(10)
+            SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                .parse(datePart)?.let { dayFormatter.format(it) }
+                ?: value
+        } catch (_: Exception) {
+            value
+        }
+    }
+
+    private fun renderHistory(
+        todayRecords: List<WaterRecord>,
+        dailyTotals: Map<String, Int>
+    ) {
         val todayKey = dayFormatter.format(Date())
 
-        val todayRecords = allRecords
-            .filter { dayFormatter.format(Date(it.timestamp)) == todayKey }
+        val sortedToday = todayRecords
+            .filter {
+                dayFormatter.format(Date(it.timestamp)) == todayKey
+            }
             .sortedByDescending { it.timestamp }
 
         val emptyMessage = findViewById<TextView>(R.id.tvHistoryEmpty)
@@ -64,53 +178,29 @@ class HistoryActivity : AppCompatActivity() {
         historyList.removeAllViews()
 
         emptyMessage.visibility =
-            if (todayRecords.isEmpty()) View.VISIBLE else View.GONE
+            if (sortedToday.isEmpty()) View.VISIBLE else View.GONE
 
-        val calendar = java.util.Calendar.getInstance()
-        val businessDays = mutableListOf<Date>()
-
-        while (businessDays.size < 5) {
-            val date = calendar.time
-            val weekday = calendar.get(java.util.Calendar.DAY_OF_WEEK)
-
-            if (weekday != java.util.Calendar.SATURDAY &&
-                weekday != java.util.Calendar.SUNDAY
-            ) {
-                businessDays.add(0, date)
-            }
-
-            calendar.add(java.util.Calendar.DAY_OF_YEAR, -1)
-        }
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -4)
 
         val days = mutableListOf<Pair<String, String>>()
-        val dailyTotals = mutableMapOf<String, Int>()
-
-        calendar.add(java.util.Calendar.DAY_OF_YEAR, -4)
-
         repeat(5) {
             val date = calendar.time
             val key = dayFormatter.format(date)
-            val weekday = java.text.SimpleDateFormat(
-                "EEE",
-                Locale("pt", "BR")
-            ).format(date).first().uppercase()
+            val label = labelFormatter.format(date)
+                .replaceFirstChar { it.uppercase(locale) }
 
-            days.add(key to weekday)
-            dailyTotals[key] = 0
-
-            calendar.add(java.util.Calendar.DAY_OF_YEAR, 1)
+            days.add(key to label)
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
         }
 
-        allRecords.forEach { record ->
-            val key = dayFormatter.format(Date(record.timestamp))
-            if (dailyTotals.containsKey(key)) {
-                dailyTotals[key] = (dailyTotals[key] ?: 0) + record.amount
-            }
+        val totals = days.associate { (key, _) ->
+            key to (dailyTotals[key] ?: 0)
         }
 
-        val weeklyTotal = dailyTotals.values.sum()
+        val weeklyTotal = totals.values.sum()
         val dailyAverage = weeklyTotal / 5
-        val maxValue = (dailyTotals.values.maxOrNull() ?: 0).coerceAtLeast(1)
+        val maxValue = (totals.values.maxOrNull() ?: 0).coerceAtLeast(1)
 
         val chartCard = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -130,7 +220,7 @@ class HistoryActivity : AppCompatActivity() {
         }
 
         chartCard.addView(TextView(this).apply {
-            text = "Consumo dos últimos 5 dias úteis"
+            text = "Consumo recente"
             textSize = 18f
             setTextColor(Color.parseColor("#183B4E"))
             setTypeface(null, Typeface.BOLD)
@@ -145,7 +235,7 @@ class HistoryActivity : AppCompatActivity() {
 
         val chartRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            gravity = android.view.Gravity.BOTTOM
+            gravity = Gravity.BOTTOM
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -153,32 +243,30 @@ class HistoryActivity : AppCompatActivity() {
         }
 
         days.forEach { (key, label) ->
-            val amount = dailyTotals[key] ?: 0
+            val amount = totals[key] ?: 0
             val barHeight = if (amount == 0) {
                 4
             } else {
-                (amount.toFloat() / maxValue * 110).toInt().coerceAtLeast(8)
+                (amount.toFloat() / maxValue * 110)
+                    .toInt().coerceAtLeast(8)
             }
 
             val column = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                gravity = android.view.Gravity.BOTTOM or
-                        android.view.Gravity.CENTER_HORIZONTAL
+                gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
                 layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    dp(155),
-                    1f
+                    0, dp(155), 1f
                 )
             }
 
             column.addView(TextView(this).apply {
                 text = if (amount >= 1000) {
-                    String.format(Locale.getDefault(), "%.1fL", amount / 1000f)
+                    String.format(locale, "%.1fL", amount / 1000f)
                 } else {
                     amount.toString()
                 }
                 textSize = 10f
-                gravity = android.view.Gravity.CENTER
+                gravity = Gravity.CENTER
                 setTextColor(Color.parseColor("#526777"))
                 maxLines = 1
             })
@@ -195,8 +283,7 @@ class HistoryActivity : AppCompatActivity() {
                     cornerRadius = dp(6).toFloat()
                 }
                 layoutParams = LinearLayout.LayoutParams(
-                    dp(30),
-                    dp(barHeight)
+                    dp(30), dp(barHeight)
                 ).apply {
                     topMargin = dp(5)
                     bottomMargin = dp(8)
@@ -204,11 +291,11 @@ class HistoryActivity : AppCompatActivity() {
             })
 
             column.addView(TextView(this).apply {
-                text = label.substringBefore("\n")
+                text = label
                 textSize = 11f
-                gravity = android.view.Gravity.CENTER
+                gravity = Gravity.CENTER
                 setTextColor(Color.parseColor("#526777"))
-                maxLines = 2
+                maxLines = 1
             })
 
             chartRow.addView(column)
@@ -225,11 +312,7 @@ class HistoryActivity : AppCompatActivity() {
             setPadding(0, 0, 0, dp(12))
         })
 
-        val timeFormatter = SimpleDateFormat("HH:mm", Locale("pt", "BR")).apply {
-            timeZone = java.util.TimeZone.getTimeZone("America/Sao_Paulo")
-        }
-
-        todayRecords.forEach { record ->
+        sortedToday.forEach { record ->
             val card = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 setPadding(dp(20), dp(18), dp(20), dp(18))
@@ -262,6 +345,7 @@ class HistoryActivity : AppCompatActivity() {
             historyList.addView(card)
         }
     }
+
     private fun dp(value: Int): Int =
         (value * resources.displayMetrics.density).toInt()
 }

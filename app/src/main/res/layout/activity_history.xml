@@ -3,19 +3,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F4F8FB">
+    android:background="@color/aqua_background">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="24dp">
 
             <include
                 layout="@layout/view_aqua_header"
@@ -26,8 +30,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Histórico"
-                android:textColor="#183B4E"
+                android:text="@string/history_title"
+                android:textColor="@color/aqua_text"
                 android:textSize="28sp"
                 android:textStyle="bold" />
 
@@ -35,20 +39,70 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="Acompanhe sua hidratação"
-                android:textColor="#718096"
-                android:textSize="17sp" />
+                android:text="@string/history_subtitle"
+                android:textColor="@color/aqua_muted_light"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_water_card"
+                android:elevation="3dp"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/history_summary_title"
+                    android:textColor="@color/aqua_muted_light"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.04" />
+
+                <TextView
+                    android:id="@+id/tvHistoryTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/initial_water_consumption"
+                    android:textColor="@color/aqua_primary"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvHistorySubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/history_today"
+                    android:textColor="@color/aqua_text"
+                    android:textSize="15sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="@string/history_records_title"
+                android:textColor="@color/aqua_text"
+                android:textSize="21sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvHistoryEmpty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_water_card"
                 android:gravity="center"
-                android:padding="24dp"
-                android:text="&#10;Nenhum registro ainda.&#10;Adicione água na tela inicial!"
-                android:textColor="#718096"
-                android:textSize="17sp"
+                android:padding="28dp"
+                android:text="@string/history_empty"
+                android:textColor="@color/aqua_muted_light"
+                android:textSize="16sp"
+                android:lineSpacingExtra="5dp"
                 android:visibility="gone" />
 
             <LinearLayout
