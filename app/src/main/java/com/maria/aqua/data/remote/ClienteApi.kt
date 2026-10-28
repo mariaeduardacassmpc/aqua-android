@@ -1,8 +1,7 @@
-
-package com.maria.aqua
+package com.maria.aqua.data.remote
 
 import android.content.Context
-import com.maria.aqua.data.remote.WaterApi
+import com.maria.aqua.SessionManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit

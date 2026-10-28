@@ -1,4 +1,4 @@
-package com.maria.aqua.dto.auth
+package com.maria.aqua.data.remote.model.auth
 
 data class PasswordResetRequest(
     val code: String,

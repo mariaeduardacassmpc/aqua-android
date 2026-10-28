@@ -18,16 +18,16 @@
         android:name=".AquaApplication"
         >
         <activity
-            android:name=".activity.RegisterActivity"
+            android:name=".ui.register.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.ForgotPasswordActivity"
+            android:name=".ui.forgot.ForgotPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".ui.login.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,10 +36,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.ResetPasswordActivity"
+            android:name=".ui.reset.ResetPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".HistoryActivity"
+            android:name=".ui.history.HistoryActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
     </application>

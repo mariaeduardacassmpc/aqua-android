@@ -1,9 +1,10 @@
-package com.maria.aqua
+package com.maria.aqua.ui.history
 
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -13,11 +14,19 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.maria.aqua.activity.MainActivity
+import com.maria.aqua.data.remote.ClienteApi
+import com.maria.aqua.DailyTotalResponse
+import com.maria.aqua.DayHistoryResponse
+import com.maria.aqua.R
+import com.maria.aqua.WaterHistory
+import com.maria.aqua.WaterRecord
+import com.maria.aqua.ui.main.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -69,12 +78,12 @@ class HistoryActivity : AppCompatActivity() {
     private fun loadHistory() {
         lifecycleScope.launch {
             try {
-                val today = java.time.LocalDate.now()
+                val today = LocalDate.now()
                 val from = today.minusDays(4).toString()
                 val to = today.toString()
 
-                val dayResponse: retrofit2.Response<DayHistoryResponse>
-                val historyResponse: retrofit2.Response<List<DailyTotalResponse>>
+                val dayResponse: Response<DayHistoryResponse>
+                val historyResponse: Response<List<DailyTotalResponse>>
 
                 withContext(Dispatchers.IO) {
                     dayResponse = ClienteApi.waterApi.getDay()
@@ -205,7 +214,7 @@ class HistoryActivity : AppCompatActivity() {
         val chartCard = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), dp(16), dp(16), dp(16))
-            background = android.graphics.drawable.GradientDrawable().apply {
+            background = GradientDrawable().apply {
                 setColor(Color.WHITE)
                 cornerRadius = dp(16).toFloat()
                 setStroke(dp(1), Color.parseColor("#E4EDF2"))
@@ -272,7 +281,7 @@ class HistoryActivity : AppCompatActivity() {
             })
 
             column.addView(View(this).apply {
-                background = android.graphics.drawable.GradientDrawable().apply {
+                background = GradientDrawable().apply {
                     setColor(
                         if (key == todayKey) {
                             Color.parseColor("#087E8B")
@@ -316,7 +325,7 @@ class HistoryActivity : AppCompatActivity() {
             val card = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 setPadding(dp(20), dp(18), dp(20), dp(18))
-                background = android.graphics.drawable.GradientDrawable().apply {
+                background = GradientDrawable().apply {
                     setColor(Color.WHITE)
                     cornerRadius = dp(12).toFloat()
                 }

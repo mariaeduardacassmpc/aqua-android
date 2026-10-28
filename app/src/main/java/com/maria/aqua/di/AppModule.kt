@@ -1,11 +1,14 @@
 package com.maria.aqua.di
 
-import com.maria.aqua.AuthApi
 import com.maria.aqua.SessionManager
+import com.maria.aqua.data.remote.AuthApi
 import com.maria.aqua.data.remote.WaterApi
+import com.maria.aqua.data.repository.WaterRepository
+import com.maria.aqua.ui.main.MainViewModel
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -56,4 +59,8 @@ val appModule = module {
         get<Retrofit>(qualifier = named("authenticated"))
             .create(WaterApi::class.java)
     }
+
+    single { WaterRepository(get()) }
+
+    viewModel { MainViewModel(get()) }
 }
