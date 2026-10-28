@@ -1,5 +1,4 @@
-
-package com.maria.aqua
+package com.maria.aqua.activity
 
 import android.os.Bundle
 import android.widget.Button
@@ -11,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import android.view.View
 import android.widget.ProgressBar
+import com.maria.aqua.ClienteApi
+import com.maria.aqua.R
+import com.maria.aqua.dto.auth.RegisterRequest
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
@@ -58,7 +60,7 @@ class RegisterActivity : AppCompatActivity() {
 
             lifecycleScope.launch {
                 try {
-                    val response = ApiClient.authApi.register(
+                    val response = ClienteApi.authApi.register(
                         RegisterRequest(
                             name = nameValue,
                             email = emailValue,

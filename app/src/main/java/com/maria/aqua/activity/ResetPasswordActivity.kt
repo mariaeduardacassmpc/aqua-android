@@ -1,5 +1,4 @@
-
-package com.maria.aqua
+package com.maria.aqua.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +10,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.maria.aqua.ClienteApi
+import com.maria.aqua.dto.auth.PasswordResetRequest
+import com.maria.aqua.R
 import kotlinx.coroutines.launch
 
 class ResetPasswordActivity : AppCompatActivity() {
@@ -81,9 +83,8 @@ class ResetPasswordActivity : AppCompatActivity() {
             setLoading(true)
 
             try {
-                val response = ApiClient.authApi.resetPassword(
+                val response = ClienteApi.authApi.resetPassword(
                     PasswordResetRequest(
-                        email = email,
                         token = code,
                         newPassword = password
                     )

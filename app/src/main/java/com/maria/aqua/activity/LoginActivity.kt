@@ -1,8 +1,8 @@
-
-package com.maria.aqua
+package com.maria.aqua.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -11,6 +11,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.maria.aqua.ClienteApi
+import com.maria.aqua.dto.auth.LoginRequest
+import com.maria.aqua.R
+import com.maria.aqua.SessionManager
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
@@ -57,7 +61,7 @@ class LoginActivity : AppCompatActivity() {
 
             lifecycleScope.launch {
                 try {
-                    val response = ApiClient.authApi.login(
+                    val response = ClienteApi.authApi.login(
                         LoginRequest(
                             email = emailValue,
                             password = passwordValue
@@ -101,7 +105,7 @@ class LoginActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     e.printStackTrace()
 
-                    android.util.Log.e(
+                    Log.e(
                         "AQUA_AUTH",
                         "Erro de login: ${e.message}",
                         e

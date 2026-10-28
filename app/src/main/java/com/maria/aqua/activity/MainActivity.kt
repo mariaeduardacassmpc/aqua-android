@@ -1,4 +1,4 @@
-package com.maria.aqua
+package com.maria.aqua.activity
 
 import android.Manifest
 import android.app.NotificationChannel
@@ -16,6 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.maria.aqua.HistoryActivity
+import com.maria.aqua.R
+import com.maria.aqua.WaterHistory
+import com.maria.aqua.WaterRecord
 
 class MainActivity : AppCompatActivity() {
 
