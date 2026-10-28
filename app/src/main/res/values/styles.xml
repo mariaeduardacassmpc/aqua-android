@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AquaButton" parent="Widget.AppCompat.Button">
+    <style name="AquaButton" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_height">52dp</item>
-        <item name="backgroundTint">#147D92</item>
-        <item name="android:backgroundTint">#147D92</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="backgroundTint">#087E8B</item>
         <item name="android:textColor">#FFFFFF</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">false</item>
-        <item name="cornerRadius">14dp</item>
+        <item name="cornerRadius">26dp</item>
     </style>
 
 </resources>

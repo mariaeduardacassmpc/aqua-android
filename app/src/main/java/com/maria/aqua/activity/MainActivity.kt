@@ -1,3 +1,4 @@
+
 package com.maria.aqua.activity
 
 import android.Manifest
@@ -16,17 +17,23 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import com.maria.aqua.ClienteApi
+import com.maria.aqua.CreateWaterLogRequest
 import com.maria.aqua.HistoryActivity
 import com.maria.aqua.R
 import com.maria.aqua.WaterHistory
+import com.maria.aqua.WaterLogResponse
 import com.maria.aqua.WaterRecord
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
     private var dailyGoal = 2000
     private var consumedWater = 0
-    private val waterHistory = mutableListOf<Int>()
-
+    private val waterLogs = mutableListOf<WaterLogResponse>()
     private lateinit var tvConsumed: TextView
     private lateinit var tvProgress: TextView
     private lateinit var progressWater: ProgressBar
@@ -48,6 +55,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        ClienteApi.initialize(applicationContext)
 
         createNotificationChannel()
         requestNotificationPermission()
@@ -92,7 +101,8 @@ class MainActivity : AppCompatActivity() {
                 description = "Notificações de consumo de água do Aqua"
             }
 
-            val manager = getSystemService(NotificationManager::class.java)
+            val manager =
+                getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }
     }
@@ -111,7 +121,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun showWaterNotification(amount: Int) {
         if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -128,11 +137,10 @@ class MainActivity : AppCompatActivity() {
             .setContentTitle("Aqua")
             .setContentText("Você adicionou $amount ml de água!")
             .setStyle(
-                NotificationCompat.BigTextStyle()
-                    .bigText(
-                        "Você adicionou $amount ml de água. " +
-                                "Continue cuidando da sua hidratação!"
-                    )
+                NotificationCompat.BigTextStyle().bigText(
+                    "Você adicionou $amount ml de água. " +
+                            "Continue cuidando da sua hidratação!"
+                )
             )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
@@ -141,41 +149,123 @@ class MainActivity : AppCompatActivity() {
         NotificationManagerCompat.from(this)
             .notify(System.currentTimeMillis().toInt(), notification)
     }
-
     private fun addWater(amount: Int) {
-        consumedWater += amount
-        waterHistory.add(amount)
-        WaterHistory.records.add(WaterRecord(amount))
+        btnUndo.isEnabled = false
 
-        updateScreen()
-        showWaterNotification(amount)
+        lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ClienteApi.waterApi.create(
+                        CreateWaterLogRequest(amountMl = amount)
+                    )
+                }
 
-        Toast.makeText(
-            this,
-            "$amount ml adicionados!",
-            Toast.LENGTH_SHORT
-        ).show()
+                if (response.isSuccessful) {
+                    val log = response.body()
+
+                    if (log == null) {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "A API não retornou o registro.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@launch
+                    }
+
+                    waterLogs.add(log)
+                    consumedWater += log.amountMl
+
+                    WaterHistory.records.add(
+                        WaterRecord(
+                            amount = log.amountMl,
+                            timestamp = System.currentTimeMillis()
+                        )
+                    )
+
+                    updateScreen()
+                    showWaterNotification(log.amountMl)
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        "${log.amountMl} ml salvos!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Não foi possível salvar (${response.code()}).",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Erro ao salvar o consumo. Verifique a conexão com a API.",
+                    Toast.LENGTH_LONG
+                ).show()
+            } finally {
+                updateScreen()
+            }
+        }
     }
-
     private fun undoLastWater() {
-        if (waterHistory.isEmpty()) return
+        val lastLog = waterLogs.lastOrNull()
 
-        val lastAmount = waterHistory.removeAt(waterHistory.lastIndex)
-        consumedWater -= lastAmount
-
-        if (WaterHistory.records.isNotEmpty()) {
-            WaterHistory.records.removeAt(WaterHistory.records.lastIndex)
+        if (lastLog == null) {
+            Toast.makeText(
+                this,
+                "Não há registros adicionados nesta sessão para desfazer.",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
         }
 
-        updateScreen()
+        btnUndo.isEnabled = false
 
-        Toast.makeText(
-            this,
-            "$lastAmount ml removidos!",
-            Toast.LENGTH_SHORT
-        ).show()
+        lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ClienteApi.waterApi.delete(lastLog.id)
+                }
+
+                if (response.isSuccessful) {
+                    waterLogs.removeAt(waterLogs.lastIndex)
+                    consumedWater =
+                        (consumedWater - lastLog.amountMl).coerceAtLeast(0)
+
+                    val historyIndex = WaterHistory.records.indexOfLast {
+                        it.amount == lastLog.amountMl
+                    }
+
+                    if (historyIndex >= 0) {
+                        WaterHistory.records.removeAt(historyIndex)
+                    }
+
+                    updateScreen()
+
+                    Toast.makeText(
+                        this@MainActivity,
+                        "${lastLog.amountMl} ml removidos!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Não foi possível remover (${response.code()}).",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Erro ao remover o consumo. Verifique a conexão com a API.",
+                    Toast.LENGTH_LONG
+                ).show()
+            } finally {
+                updateScreen()
+            }
+        }
     }
-
     private fun updateScreen() {
         tvConsumed.text = "$consumedWater ml"
 
@@ -183,7 +273,49 @@ class MainActivity : AppCompatActivity() {
         progressWater.progress = consumedWater.coerceAtMost(dailyGoal)
         tvProgress.text = "$percentage% da meta atingida"
 
-        btnUndo.isEnabled = waterHistory.isNotEmpty()
-        btnUndo.alpha = if (waterHistory.isEmpty()) 0.5f else 1f
+        btnUndo.isEnabled = waterLogs.isNotEmpty()
+        btnUndo.alpha = if (waterLogs.isEmpty()) 0.5f else 1f
+    }
+
+    private fun loadTodayWater() {
+        lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ClienteApi.waterApi.getDay()
+                }
+
+                if (response.isSuccessful) {
+                    val dayData = response.body() ?: return@launch
+
+                    consumedWater = dayData.totalMl
+                    waterLogs.clear()
+                    waterLogs.addAll(dayData.logs)
+
+                    WaterHistory.records.clear()
+                    WaterHistory.records.addAll(
+                        dayData.logs.map { log ->
+                            WaterRecord(
+                                amount = log.amountMl,
+                                timestamp = System.currentTimeMillis()
+                            )
+                        }
+                    )
+
+                    updateScreen()
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Erro ao carregar consumo: ${response.code()}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Não foi possível carregar o consumo salvo.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 }

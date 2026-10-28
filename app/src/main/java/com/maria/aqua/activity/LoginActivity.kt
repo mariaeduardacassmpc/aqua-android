@@ -22,7 +22,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
+        ClienteApi.initialize(applicationContext)
         val forgotPassword = findViewById<TextView>(R.id.tvForgotPassword)
 
         forgotPassword.setOnClickListener {

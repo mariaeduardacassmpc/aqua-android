@@ -85,7 +85,7 @@ class ResetPasswordActivity : AppCompatActivity() {
             try {
                 val response = ClienteApi.authApi.resetPassword(
                     PasswordResetRequest(
-                        token = code,
+                        code = code,
                         newPassword = password
                     )
                 )
