@@ -4,44 +4,55 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.maria.aqua.data.repository.WaterRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
-import java.time.LocalDate
 
-class HistoryViewModel(private val repository: WaterRepository) : ViewModel() {
+class HistoryViewModel(
+    private val repository: WaterRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HistoryUiState())
-    val uiState: StateFlow<HistoryUiState> = _uiState.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
-    fun load(today: LocalDate = LocalDate.now()) {
+    fun load() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            repository.getHistory(today)
-                .onSuccess { summary ->
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            try {
+                val response = repository.getDay()
+
+                if (response.isSuccessful) {
+                    val dayData = response.body()
+
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            days = summary.days,
-                            todayLogs = summary.todayLogs,
+                            todayLogs = dayData?.logs
+                                ?.map { log ->
+                                    com.maria.aqua.WaterRecord(
+                                        amount = log.amountMl,
+                                        timestamp = System.currentTimeMillis()
+                                    )
+                                }
+                                .orEmpty(),
                             error = null
                         )
                     }
+                } else {
+                    _uiState.update {
+                        it.copy(isLoading = false, error = HistoryError.SERVER)
+                    }
                 }
-                .onFailure { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.toHistoryError()) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(isLoading = false, error = HistoryError.UNKNOWN)
                 }
+            }
         }
     }
 
-    fun onErrorShown() = _uiState.update { it.copy(error = null) }
-}
-
-private fun Throwable.toHistoryError() = when (this) {
-    is IOException -> HistoryError.NETWORK
-    is HttpException -> HistoryError.SERVER
-    else -> HistoryError.UNKNOWN
+    fun onErrorShown() {
+        _uiState.update { it.copy(error = null) }
+    }
 }

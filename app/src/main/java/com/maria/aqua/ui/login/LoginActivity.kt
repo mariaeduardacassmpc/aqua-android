@@ -1,4 +1,4 @@
-package com.maria.aqua.ui
+package com.maria.aqua.ui.login
 
 import android.content.Intent
 import android.os.Bundle
@@ -15,10 +15,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.maria.aqua.R
 import com.maria.aqua.SessionManager
-import com.maria.aqua.ui.forgot.ForgotPasswordActivity
 import com.maria.aqua.ui.main.MainActivity
+import com.maria.aqua.ui.forgot.ForgotPasswordActivity
 import com.maria.aqua.ui.register.RegisterActivity
 import kotlinx.coroutines.launch
+import com.maria.aqua.ui.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
 
@@ -73,7 +74,10 @@ class LoginActivity : AppCompatActivity() {
                     if (!token.isNullOrBlank() && token != handledToken) {
                         handledToken = token
 
-                        SessionManager.saveToken(this@LoginActivity, token)
+                        SessionManager.saveToken(
+                            this@LoginActivity,
+                            token
+                        )
 
                         Toast.makeText(
                             this@LoginActivity,
@@ -82,8 +86,12 @@ class LoginActivity : AppCompatActivity() {
                         ).show()
 
                         startActivity(
-                            Intent(this@LoginActivity, MainActivity::class.java)
+                            Intent(
+                                this@LoginActivity,
+                                MainActivity::class.java
+                            )
                         )
+
                         finish()
                     }
                 }

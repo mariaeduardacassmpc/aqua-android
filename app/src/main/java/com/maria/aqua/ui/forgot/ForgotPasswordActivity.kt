@@ -1,4 +1,4 @@
-package com.maria.aqua
+package com.maria.aqua.ui.forgot
 
 import android.content.Intent
 import android.os.Bundle
@@ -16,6 +16,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.maria.aqua.data.remote.ClienteApi
 import com.maria.aqua.ui.ForgotPasswordViewModel
 import kotlinx.coroutines.launch
+import com.maria.aqua.R
 
 class ForgotPasswordActivity : AppCompatActivity() {
 

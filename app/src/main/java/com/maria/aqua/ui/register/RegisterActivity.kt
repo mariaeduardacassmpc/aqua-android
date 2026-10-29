@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.maria.aqua.data.remote.ClienteApi
 import com.maria.aqua.R
-import com.maria.aqua.ui.LoginActivity
+import com.maria.aqua.ui.login.LoginActivity
 import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {

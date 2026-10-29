@@ -38,7 +38,7 @@
     </style>
 
     <style name="AquaError" parent="">
-        <color name="aqua_error">#D32F2F</color>
+        <item name="android:textColor">@color/aqua_error</item>
         <item name="android:textSize">15sp</item>
     </style>
 

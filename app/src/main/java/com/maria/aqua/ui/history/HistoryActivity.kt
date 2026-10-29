@@ -1,3 +1,4 @@
+
 package com.maria.aqua.ui.history
 
 import android.content.Intent
@@ -13,26 +14,24 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import com.maria.aqua.data.remote.ClienteApi
-import com.maria.aqua.DailyTotalResponse
-import com.maria.aqua.DayHistoryResponse
+import androidx.lifecycle.repeatOnLifecycle
 import com.maria.aqua.R
 import com.maria.aqua.WaterHistory
 import com.maria.aqua.WaterRecord
 import com.maria.aqua.ui.main.MainActivity
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Response
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
 class HistoryActivity : AppCompatActivity() {
+
+    private val historyViewModel: HistoryViewModel by viewModel()
 
     private val locale = Locale("pt", "BR")
     private val dayFormatter = SimpleDateFormat("yyyyMMdd", locale)
@@ -44,8 +43,6 @@ class HistoryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history)
-
-        ClienteApi.initialize(applicationContext)
 
         val navHome = findViewById<Button>(R.id.navHome)
         val navHistory = findViewById<Button>(R.id.navHistory)
@@ -60,110 +57,59 @@ class HistoryActivity : AppCompatActivity() {
 
         navHome.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP
+            intent.flags =
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
 
-        navHistory.setOnClickListener {
-            loadHistory()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                historyViewModel.uiState.collect { state ->
+                    if (state.isLoading) return@collect
+
+                    state.error?.let {
+                        Toast.makeText(
+                            this@HistoryActivity,
+                            "Erro ao carregar histórico: $it",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        historyViewModel.onErrorShown()
+                        return@collect
+                    }
+
+                    val dailyTotals = state.days.associate {
+                        normalizeDay(it.day) to it.totalMl
+                    }.toMutableMap()
+
+                    val todayKey = dayFormatter.format(Date())
+                    dailyTotals[todayKey] =
+                        dailyTotals[todayKey] ?: state.todayLogs.sumOf { it.amount }
+
+                    WaterHistory.records.clear()
+                    WaterHistory.records.addAll(state.todayLogs)
+
+                    renderHistory(
+                        todayRecords = state.todayLogs,
+                        dailyTotals = dailyTotals
+                    )
+                }
+            }
         }
+
+        historyViewModel.load()
     }
 
     override fun onResume() {
         super.onResume()
-        loadHistory()
-    }
-
-    private fun loadHistory() {
-        lifecycleScope.launch {
-            try {
-                val today = LocalDate.now()
-                val from = today.minusDays(4).toString()
-                val to = today.toString()
-
-                val dayResponse: Response<DayHistoryResponse>
-                val historyResponse: Response<List<DailyTotalResponse>>
-
-                withContext(Dispatchers.IO) {
-                    dayResponse = ClienteApi.waterApi.getDay()
-                    historyResponse = ClienteApi.waterApi.getHistory(from, to)
-                }
-
-                if (!dayResponse.isSuccessful || !historyResponse.isSuccessful) {
-                    Toast.makeText(
-                        this@HistoryActivity,
-                        "Erro ao carregar histórico: dia ${dayResponse.code()}, gráfico ${historyResponse.code()}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return@launch
-                }
-
-                val dayData = dayResponse.body() ?: return@launch
-                val historyData = historyResponse.body().orEmpty()
-
-                val todayRecords = dayData.logs.map { log ->
-                    WaterRecord(
-                        amount = log.amountMl,
-                        timestamp = parseTimestamp(log.consumedAt)
-                    )
-                }
-
-                WaterHistory.records.clear()
-                WaterHistory.records.addAll(todayRecords)
-
-                val dailyTotals = historyData.associate { item ->
-                    normalizeDay(item.day) to item.totalMl
-                }.toMutableMap()
-
-                dailyTotals[normalizeDay(today.toString())] = dayData.totalMl
-
-                renderHistory(
-                    todayRecords = todayRecords,
-                    dailyTotals = dailyTotals
-                )
-            } catch (e: Exception) {
-                Toast.makeText(
-                    this@HistoryActivity,
-                    "Erro ao carregar histórico: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
-    }
-    private fun parseTimestamp(value: String): Long {
-        return try {
-            val normalized = value.replace(" ", "T")
-            val patterns = listOf(
-                "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-                "yyyy-MM-dd'T'HH:mm:ssXXX",
-                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-                "yyyy-MM-dd'T'HH:mm:ss'Z'",
-                "yyyy-MM-dd'T'HH:mm:ss"
-            )
-
-            patterns.firstNotNullOfOrNull { pattern ->
-                try {
-                    val formatter = SimpleDateFormat(pattern, Locale.US)
-                    formatter.isLenient = false
-                    if (pattern.endsWith("'Z'")) {
-                        formatter.timeZone = TimeZone.getTimeZone("UTC")
-                    }
-                    formatter.parse(normalized)?.time
-                } catch (_: Exception) {
-                    null
-                }
-            } ?: System.currentTimeMillis()
-        } catch (_: Exception) {
-            System.currentTimeMillis()
-        }
+        historyViewModel.load()
     }
 
     private fun normalizeDay(value: String): String {
         return try {
             val datePart = value.take(10)
             SimpleDateFormat("yyyy-MM-dd", Locale.US)
-                .parse(datePart)?.let { dayFormatter.format(it) }
+                .parse(datePart)
+                ?.let { dayFormatter.format(it) }
                 ?: value
         } catch (_: Exception) {
             value
@@ -198,7 +144,6 @@ class HistoryActivity : AppCompatActivity() {
             val key = dayFormatter.format(date)
             val label = labelFormatter.format(date)
                 .replaceFirstChar { it.uppercase(locale) }
-
             days.add(key to label)
             calendar.add(Calendar.DAY_OF_YEAR, 1)
         }
@@ -256,16 +201,13 @@ class HistoryActivity : AppCompatActivity() {
             val barHeight = if (amount == 0) {
                 4
             } else {
-                (amount.toFloat() / maxValue * 110)
-                    .toInt().coerceAtLeast(8)
+                (amount.toFloat() / maxValue * 110).toInt().coerceAtLeast(8)
             }
 
             val column = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-                layoutParams = LinearLayout.LayoutParams(
-                    0, dp(155), 1f
-                )
+                layoutParams = LinearLayout.LayoutParams(0, dp(155), 1f)
             }
 
             column.addView(TextView(this).apply {
@@ -283,11 +225,8 @@ class HistoryActivity : AppCompatActivity() {
             column.addView(View(this).apply {
                 background = GradientDrawable().apply {
                     setColor(
-                        if (key == todayKey) {
-                            Color.parseColor("#087E8B")
-                        } else {
-                            Color.parseColor("#69C7E5")
-                        }
+                        if (key == todayKey) Color.parseColor("#087E8B")
+                        else Color.parseColor("#69C7E5")
                     )
                     cornerRadius = dp(6).toFloat()
                 }
@@ -346,7 +285,9 @@ class HistoryActivity : AppCompatActivity() {
             })
 
             card.addView(TextView(this).apply {
-                text = "Registrado às ${timeFormatter.format(Date(record.timestamp))}"
+                text = "Registrado às ${
+                    timeFormatter.format(Date(record.timestamp))
+                }"
                 textSize = 14f
                 setTextColor(Color.rgb(113, 128, 150))
             })

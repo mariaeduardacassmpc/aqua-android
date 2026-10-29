@@ -9,4 +9,5 @@
     <color name="aqua_nav_inactive">#F4F8FB</color>
     <color name="aqua_background">#F4F8FB</color>
     <color name="aqua_divider">#DCE6EB</color>
+    <color name="aqua_error">#D32F2F</color>
 </resources>
